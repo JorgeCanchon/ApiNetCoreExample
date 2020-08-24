@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APIExample.Controllers
 {
@@ -38,7 +39,7 @@ namespace APIExample.Controllers
             try
             {
                 ProductViewModel result = _productRepository.Create(product);
-                if (result != null && result.ProductId > 0)
+                if (result != null)
                     return Ok(result);
                         return StatusCode(500);
             }
@@ -46,6 +47,33 @@ namespace APIExample.Controllers
             {
                 return Problem(e.Message);
             }
+        }
+
+        [HttpPut]
+        public IActionResult Put(ProductViewModel product)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = _productRepository.Update(product, "ProductId");
+            if (result != EntityState.Modified)
+                return StatusCode(500);
+            return Ok();
+        }
+
+        [HttpDelete("{idproduct}")]
+        public IActionResult Delete(long idproduct)
+        {
+            ProductViewModel product = _productRepository.FindByCondition(x => x.ProductId == idproduct).FirstOrDefault();
+            if(product != null)
+            {
+                var result = _productRepository.Delete(product);
+                if (result != EntityState.Deleted)
+                    return StatusCode(500);
+                return Ok();
+            }
+            return StatusCode(500);
         }
     }
 }
