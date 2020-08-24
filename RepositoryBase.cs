@@ -14,11 +14,19 @@ namespace APIExample
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public T Create(T entity) =>
-            Context.Set<T>().Add(entity).Entity;
+        public T Create(T entity)
+        {
+            T result = Context.Set<T>().Add(entity).Entity;
+            Context.SaveChanges();
+            return result;
+        }
 
-        public EntityState Delete(T entity) =>
-            Context.Set<T>().Remove(entity).State;
+        public EntityState Delete(T entity)
+        {
+            var result = Context.Set<T>().Remove(entity).State;
+            Context.SaveChanges();
+            return result;
+        }
 
         public IQueryable<T> FindAll() =>
             Context.Set<T>().AsNoTracking();
@@ -29,7 +37,9 @@ namespace APIExample
         public EntityState Update(T entity, string propertyName)
         {
             Context.Entry<T>(entity).Property(propertyName).IsModified = false;
-            return Context.Set<T>().Update(entity).State;
+            var result = Context.Set<T>().Update(entity).State;
+            Context.SaveChanges();
+            return result;
         }
     }
 }
