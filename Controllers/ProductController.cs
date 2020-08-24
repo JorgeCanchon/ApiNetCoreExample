@@ -39,7 +39,7 @@ namespace APIExample.Controllers
             try
             {
                 ProductViewModel result = _productRepository.Create(product);
-                if (result != null)
+                if (result != null && result.ProductId > 0)
                     return Ok(result);
                         return StatusCode(500);
             }
